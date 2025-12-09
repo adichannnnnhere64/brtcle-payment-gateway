@@ -1,6 +1,252 @@
 {
     "packages": [
         {
+            "name": "adichan/product",
+            "version": "dev-master",
+            "version_normalized": "dev-master",
+            "dist": {
+                "type": "path",
+                "url": "../Product",
+                "reference": "edeb7e148330fceb24246747f2aad2ca6b5e0e90"
+            },
+            "require": {
+                "illuminate/support": "^12.0",
+                "pestphp/pest": "^4.1.5",
+                "php": "^8.3"
+            },
+            "require-dev": {
+                "driftingly/rector-laravel": "^2.1.3",
+                "fakerphp/faker": "^1.24.1",
+                "larastan/larastan": "^3.8.0",
+                "laravel/boost": "^1.8.3",
+                "laravel/pail": "^1.2.4",
+                "laravel/pint": "^1.26.0",
+                "laravel/tinker": ">=2.10.2",
+                "mockery/mockery": "^1.6.12",
+                "nunomaduro/collision": "^8.8.3",
+                "orchestra/testbench": "^10.8.0",
+                "pestphp/pest": "^4.1.5",
+                "pestphp/pest-plugin-browser": "^4.1.1",
+                "pestphp/pest-plugin-laravel": "^4.0.0",
+                "pestphp/pest-plugin-type-coverage": "^4.0.3",
+                "rector/rector": "^2.2.8"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "Adichan\\Product\\ProductServiceProvider"
+                    ],
+                    "factories": "database/factories",
+                    "aliases": {
+                        "Product": "Adichan\\Product\\ProductFacade"
+                    }
+                }
+            },
+            "installation-source": "dist",
+            "autoload": {
+                "psr-4": {
+                    "Adichan\\Product\\": "src",
+                    "Database\\Factories\\": "src/database/factories/"
+                }
+            },
+            "autoload-dev": {
+                "psr-4": {
+                    "Adichan\\Product\\Tests\\": "tests"
+                }
+            },
+            "scripts": {
+                "test": [
+                    "vendor/bin/phpunit"
+                ],
+                "test-coverage": [
+                    "vendor/bin/phpunit --coverage-html coverage"
+                ]
+            },
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Adrian Radores",
+                    "email": "mobistyle35@gmail.com",
+                    "role": "Developer"
+                }
+            ],
+            "description": "For products",
+            "homepage": "https://github.com/adichan/product",
+            "keywords": [
+                "adichan",
+                "product"
+            ],
+            "transport-options": {
+                "relative": true
+            },
+            "install-path": "../adichan/product"
+        },
+        {
+            "name": "adichan/transaction",
+            "version": "dev-master",
+            "version_normalized": "dev-master",
+            "dist": {
+                "type": "path",
+                "url": "../Transaction",
+                "reference": "ae10ff98c399734f31695815ff692d8ae090f009"
+            },
+            "require": {
+                "illuminate/support": "^12.0",
+                "pestphp/pest": "^4.1.5",
+                "php": "^8.3"
+            },
+            "require-dev": {
+                "driftingly/rector-laravel": "^2.1.3",
+                "fakerphp/faker": "^1.24.1",
+                "larastan/larastan": "^3.8.0",
+                "laravel/boost": "^1.8.3",
+                "laravel/pail": "^1.2.4",
+                "laravel/pint": "^1.26.0",
+                "laravel/tinker": ">=2.10.2",
+                "mockery/mockery": "^1.6.12",
+                "nunomaduro/collision": "^8.8.3",
+                "orchestra/testbench": "^10.8.0",
+                "pestphp/pest": "^4.1.5",
+                "pestphp/pest-plugin-browser": "^4.1.1",
+                "pestphp/pest-plugin-laravel": "^4.0.0",
+                "pestphp/pest-plugin-type-coverage": "^4.0.3",
+                "rector/rector": "^2.2.8"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "Adichan\\Transaction\\TransactionServiceProvider"
+                    ],
+                    "factories": "database/factories"
+                }
+            },
+            "installation-source": "dist",
+            "autoload": {
+                "psr-4": {
+                    "Adichan\\Transaction\\": "src",
+                    "Database\\Factories\\": "src/database/factories/"
+                }
+            },
+            "autoload-dev": {
+                "psr-4": {
+                    "Adichan\\Transaction\\Tests\\": "tests"
+                }
+            },
+            "scripts": {
+                "test": [
+                    "vendor/bin/phpunit"
+                ],
+                "test-coverage": [
+                    "vendor/bin/phpunit --coverage-html coverage"
+                ]
+            },
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Adrian Radores",
+                    "email": "mobistyle35@gmail.com",
+                    "role": "Developer"
+                }
+            ],
+            "description": "For transactions",
+            "homepage": "https://github.com/adichan/product",
+            "keywords": [
+                "adichan",
+                "transaction"
+            ],
+            "transport-options": {
+                "relative": true
+            },
+            "install-path": "../adichan/transaction"
+        },
+        {
+            "name": "adichan/wallet",
+            "version": "dev-master",
+            "version_normalized": "dev-master",
+            "dist": {
+                "type": "path",
+                "url": "../Wallet",
+                "reference": "e9774fd22561cdc1acd3846eed3fa2b84e89c0fe"
+            },
+            "require": {
+                "illuminate/support": "^12.0",
+                "pestphp/pest": "^4.1.5",
+                "php": "^8.3"
+            },
+            "require-dev": {
+                "driftingly/rector-laravel": "^2.1.3",
+                "fakerphp/faker": "^1.24.1",
+                "larastan/larastan": "^3.8.0",
+                "laravel/boost": "^1.8.3",
+                "laravel/pail": "^1.2.4",
+                "laravel/pint": "^1.26.0",
+                "laravel/tinker": ">=2.10.2",
+                "mockery/mockery": "^1.6.12",
+                "nunomaduro/collision": "^8.8.3",
+                "orchestra/testbench": "^10.8.0",
+                "pestphp/pest": "^4.1.5",
+                "pestphp/pest-plugin-browser": "^4.1.1",
+                "pestphp/pest-plugin-laravel": "^4.0.0",
+                "pestphp/pest-plugin-type-coverage": "^4.0.3",
+                "rector/rector": "^2.2.8"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "Adichan\\Wallet\\WalletServiceProvider"
+                    ],
+                    "factories": "database/factories"
+                }
+            },
+            "installation-source": "dist",
+            "autoload": {
+                "psr-4": {
+                    "Adichan\\Wallet\\": "src",
+                    "Database\\Factories\\": "src/database/factories/"
+                }
+            },
+            "autoload-dev": {
+                "psr-4": {
+                    "Adichan\\Wallet\\Tests\\": "tests"
+                }
+            },
+            "scripts": {
+                "test": [
+                    "vendor/bin/phpunit"
+                ],
+                "test-coverage": [
+                    "vendor/bin/phpunit --coverage-html coverage"
+                ]
+            },
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Adrian Radores",
+                    "email": "mobistyle35@gmail.com",
+                    "role": "Developer"
+                }
+            ],
+            "description": "For wallet",
+            "homepage": "https://github.com/adichan/product",
+            "keywords": [
+                "adichan",
+                "wallet"
+            ],
+            "transport-options": {
+                "relative": true
+            },
+            "install-path": "../adichan/wallet"
+        },
+        {
             "name": "amphp/amp",
             "version": "v3.1.1",
             "version_normalized": "3.1.1.0",
@@ -3189,17 +3435,17 @@
         },
         {
             "name": "laravel/boost",
-            "version": "v1.8.4",
-            "version_normalized": "1.8.4.0",
+            "version": "v1.8.5",
+            "version_normalized": "1.8.5.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/laravel/boost.git",
-                "reference": "dbdef07edbf101049f6d308654ead2f4324de703"
+                "reference": "99c15c392f3c6f049f0671dd5dc7b6e9a75cfe7e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/laravel/boost/zipball/dbdef07edbf101049f6d308654ead2f4324de703",
-                "reference": "dbdef07edbf101049f6d308654ead2f4324de703",
+                "url": "https://api.github.com/repos/laravel/boost/zipball/99c15c392f3c6f049f0671dd5dc7b6e9a75cfe7e",
+                "reference": "99c15c392f3c6f049f0671dd5dc7b6e9a75cfe7e",
                 "shasum": ""
             },
             "require": {
@@ -3214,14 +3460,14 @@
                 "php": "^8.1"
             },
             "require-dev": {
-                "laravel/pint": "1.20",
+                "laravel/pint": "^1.20.0",
                 "mockery/mockery": "^1.6.12",
                 "orchestra/testbench": "^8.36.0|^9.15.0|^10.6",
-                "pestphp/pest": "^2.36.0|^3.8.4",
+                "pestphp/pest": "^2.36.0|^3.8.4|^4.1.5",
                 "phpstan/phpstan": "^2.1.27",
                 "rector/rector": "^2.1"
             },
-            "time": "2025-12-05T05:54:57+00:00",
+            "time": "2025-12-08T21:54:49+00:00",
             "type": "library",
             "extra": {
                 "laravel": {
@@ -3480,30 +3726,30 @@
         },
         {
             "name": "laravel/mcp",
-            "version": "v0.4.1",
-            "version_normalized": "0.4.1.0",
+            "version": "v0.4.2",
+            "version_normalized": "0.4.2.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/laravel/mcp.git",
-                "reference": "27ab10181d25067de7ace427edb562084d0d0aa3"
+                "reference": "1c7878be3931a19768f791ddf141af29f43fb4ef"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/laravel/mcp/zipball/27ab10181d25067de7ace427edb562084d0d0aa3",
-                "reference": "27ab10181d25067de7ace427edb562084d0d0aa3",
+                "url": "https://api.github.com/repos/laravel/mcp/zipball/1c7878be3931a19768f791ddf141af29f43fb4ef",
+                "reference": "1c7878be3931a19768f791ddf141af29f43fb4ef",
                 "shasum": ""
             },
             "require": {
                 "ext-json": "*",
                 "ext-mbstring": "*",
-                "illuminate/console": "^10.49.0|^11.45.3|^12.28.1",
-                "illuminate/container": "^10.49.0|^11.45.3|^12.28.1",
-                "illuminate/contracts": "^10.49.0|^11.45.3|^12.28.1",
-                "illuminate/http": "^10.49.0|^11.45.3|^12.28.1",
-                "illuminate/json-schema": "^12.28.1",
-                "illuminate/routing": "^10.49.0|^11.45.3|^12.28.1",
-                "illuminate/support": "^10.49.0|^11.45.3|^12.28.1",
-                "illuminate/validation": "^10.49.0|^11.45.3|^12.28.1",
+                "illuminate/console": "^10.49.0|^11.45.3|^12.41.1",
+                "illuminate/container": "^10.49.0|^11.45.3|^12.41.1",
+                "illuminate/contracts": "^10.49.0|^11.45.3|^12.41.1",
+                "illuminate/http": "^10.49.0|^11.45.3|^12.41.1",
+                "illuminate/json-schema": "^12.41.1",
+                "illuminate/routing": "^10.49.0|^11.45.3|^12.41.1",
+                "illuminate/support": "^10.49.0|^11.45.3|^12.41.1",
+                "illuminate/validation": "^10.49.0|^11.45.3|^12.41.1",
                 "php": "^8.1"
             },
             "require-dev": {
@@ -3513,7 +3759,7 @@
                 "phpstan/phpstan": "^2.1.27",
                 "rector/rector": "^2.2.4"
             },
-            "time": "2025-12-04T17:29:08+00:00",
+            "time": "2025-12-07T15:49:15+00:00",
             "type": "library",
             "extra": {
                 "laravel": {
@@ -5923,6 +6169,109 @@
             "install-path": "../orchestra/workbench"
         },
         {
+            "name": "paypal/paypal-checkout-sdk",
+            "version": "1.0.2",
+            "version_normalized": "1.0.2.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/paypal/Checkout-PHP-SDK.git",
+                "reference": "19992ce7051ff9e47e643f28abb8cc1b3e5f1812"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/paypal/Checkout-PHP-SDK/zipball/19992ce7051ff9e47e643f28abb8cc1b3e5f1812",
+                "reference": "19992ce7051ff9e47e643f28abb8cc1b3e5f1812",
+                "shasum": ""
+            },
+            "require": {
+                "paypal/paypalhttp": "1.0.1"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^5.7"
+            },
+            "time": "2021-09-21T20:57:38+00:00",
+            "type": "library",
+            "installation-source": "dist",
+            "autoload": {
+                "psr-4": {
+                    "Sample\\": "samples/",
+                    "PayPalCheckoutSdk\\": "lib/PayPalCheckoutSdk"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "https://github.com/paypal/Checkout-PHP-SDK/blob/master/LICENSE"
+            ],
+            "authors": [
+                {
+                    "name": "PayPal",
+                    "homepage": "https://github.com/paypal/Checkout-PHP-SDK/contributors"
+                }
+            ],
+            "description": "PayPal's PHP SDK for Checkout REST APIs",
+            "homepage": "http://github.com/paypal/Checkout-PHP-SDK/",
+            "keywords": [
+                "checkout",
+                "orders",
+                "payments",
+                "paypal",
+                "rest",
+                "sdk"
+            ],
+            "support": {
+                "source": "https://github.com/paypal/Checkout-PHP-SDK/tree/1.0.2"
+            },
+            "abandoned": "paypal/paypal-server-sdk",
+            "install-path": "../paypal/paypal-checkout-sdk"
+        },
+        {
+            "name": "paypal/paypalhttp",
+            "version": "1.0.1",
+            "version_normalized": "1.0.1.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/paypal/paypalhttp_php.git",
+                "reference": "7b09c89c80828e842c79230e7f156b61fbb68d25"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/paypal/paypalhttp_php/zipball/7b09c89c80828e842c79230e7f156b61fbb68d25",
+                "reference": "7b09c89c80828e842c79230e7f156b61fbb68d25",
+                "shasum": ""
+            },
+            "require": {
+                "ext-curl": "*"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^5.7",
+                "wiremock-php/wiremock-php": "1.43.2"
+            },
+            "time": "2021-09-14T21:35:26+00:00",
+            "type": "library",
+            "installation-source": "dist",
+            "autoload": {
+                "psr-4": {
+                    "PayPalHttp\\": "lib/PayPalHttp"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "PayPal",
+                    "homepage": "https://github.com/paypal/paypalhttp_php/contributors"
+                }
+            ],
+            "support": {
+                "issues": "https://github.com/paypal/paypalhttp_php/issues",
+                "source": "https://github.com/paypal/paypalhttp_php/tree/1.0.1"
+            },
+            "abandoned": true,
+            "install-path": "../paypal/paypalhttp"
+        },
+        {
             "name": "pestphp/pest",
             "version": "v4.1.6",
             "version_normalized": "4.1.6.0",
@@ -8236,17 +8585,17 @@
         },
         {
             "name": "rector/rector",
-            "version": "2.2.13",
-            "version_normalized": "2.2.13.0",
+            "version": "2.2.14",
+            "version_normalized": "2.2.14.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/rectorphp/rector.git",
-                "reference": "4674fb4989168f009016849a0078349a532c42b8"
+                "reference": "6d56bb0e94d4df4f57a78610550ac76ab403657d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/rectorphp/rector/zipball/4674fb4989168f009016849a0078349a532c42b8",
-                "reference": "4674fb4989168f009016849a0078349a532c42b8",
+                "url": "https://api.github.com/repos/rectorphp/rector/zipball/6d56bb0e94d4df4f57a78610550ac76ab403657d",
+                "reference": "6d56bb0e94d4df4f57a78610550ac76ab403657d",
                 "shasum": ""
             },
             "require": {
@@ -8262,7 +8611,7 @@
             "suggest": {
                 "ext-dom": "To manipulate phpunit.xml via the custom-rule command"
             },
-            "time": "2025-12-09T07:45:59+00:00",
+            "time": "2025-12-09T10:57:55+00:00",
             "bin": [
                 "bin/rector"
             ],
@@ -8287,7 +8636,7 @@
             ],
             "support": {
                 "issues": "https://github.com/rectorphp/rector/issues",
-                "source": "https://github.com/rectorphp/rector/tree/2.2.13"
+                "source": "https://github.com/rectorphp/rector/tree/2.2.14"
             },
             "funding": [
                 {
@@ -9362,6 +9711,68 @@
                 }
             ],
             "install-path": "../staabm/side-effects-detector"
+        },
+        {
+            "name": "stripe/stripe-php",
+            "version": "v19.0.0",
+            "version_normalized": "19.0.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/stripe/stripe-php.git",
+                "reference": "8f868a7825d2680e917f89839e4b67851dad96e2"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/stripe/stripe-php/zipball/8f868a7825d2680e917f89839e4b67851dad96e2",
+                "reference": "8f868a7825d2680e917f89839e4b67851dad96e2",
+                "shasum": ""
+            },
+            "require": {
+                "ext-curl": "*",
+                "ext-json": "*",
+                "ext-mbstring": "*",
+                "php": ">=5.6.0"
+            },
+            "require-dev": {
+                "friendsofphp/php-cs-fixer": "3.72.0",
+                "phpstan/phpstan": "^1.2",
+                "phpunit/phpunit": "^5.7 || ^9.0"
+            },
+            "time": "2025-11-18T18:50:16+00:00",
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "2.0-dev"
+                }
+            },
+            "installation-source": "dist",
+            "autoload": {
+                "psr-4": {
+                    "Stripe\\": "lib/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Stripe and contributors",
+                    "homepage": "https://github.com/stripe/stripe-php/contributors"
+                }
+            ],
+            "description": "Stripe PHP Library",
+            "homepage": "https://stripe.com/",
+            "keywords": [
+                "api",
+                "payment processing",
+                "stripe"
+            ],
+            "support": {
+                "issues": "https://github.com/stripe/stripe-php/issues",
+                "source": "https://github.com/stripe/stripe-php/tree/v19.0.0"
+            },
+            "install-path": "../stripe/stripe-php"
         },
         {
             "name": "symfony/clock",

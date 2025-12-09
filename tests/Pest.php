@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-use Adichan\Transaction\Tests\TestCase;
+use Adichan\Payment\Tests\TestCase;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Http;

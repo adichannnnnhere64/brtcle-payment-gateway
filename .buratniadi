@@ -1,0 +1,4 @@
+composer.json
+src/**/*.php
+tests/**/*.php
+config/**/*.php
