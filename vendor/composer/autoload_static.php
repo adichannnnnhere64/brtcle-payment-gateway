@@ -274,8 +274,8 @@ class ComposerStaticInit41bef29393aaece1fc9932e43d963983
             'Amp\\Cache\\' => 10,
             'Amp\\ByteStream\\' => 15,
             'Amp\\' => 4,
-            'Adichan\\Product\\Tests\\' => 22,
-            'Adichan\\Product\\' => 16,
+            'Adichan\\Transaction\\Tests\\' => 26,
+            'Adichan\\Transaction\\' => 20,
         ),
     );
 
@@ -814,11 +814,11 @@ class ComposerStaticInit41bef29393aaece1fc9932e43d963983
         array (
             0 => __DIR__ . '/..' . '/amphp/amp/src',
         ),
-        'Adichan\\Product\\Tests\\' => 
+        'Adichan\\Transaction\\Tests\\' => 
         array (
             0 => __DIR__ . '/../..' . '/tests',
         ),
-        'Adichan\\Product\\' => 
+        'Adichan\\Transaction\\' => 
         array (
             0 => __DIR__ . '/../..' . '/src',
         ),

@@ -1,8 +1,8 @@
 <?php
 
-namespace Adichan\Product\Tests;
+namespace Adichan\Transaction\Tests;
 
-use Adichan\Product\ProductServiceProvider;
+use Adichan\Transaction\TransactionServiceProvider;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Orchestra\Testbench\TestCase as Orchestra;
 
@@ -13,7 +13,7 @@ class TestCase extends Orchestra
     protected function getPackageProviders($app): array
     {
         return [
-            ProductServiceProvider::class,
+            TransactionServiceProvider::class,
         ];
     }
 

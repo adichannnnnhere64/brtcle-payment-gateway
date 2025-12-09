@@ -1,19 +1,19 @@
 <?php return array(
     'root' => array(
-        'name' => 'adichan/product',
+        'name' => 'adichan/transaction',
         'pretty_version' => 'dev-master',
         'version' => 'dev-master',
-        'reference' => '2ebc77992f9e6963ad1faaae473eafadd2959fe9',
+        'reference' => 'edeb7e148330fceb24246747f2aad2ca6b5e0e90',
         'type' => 'library',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
         'dev' => true,
     ),
     'versions' => array(
-        'adichan/product' => array(
+        'adichan/transaction' => array(
             'pretty_version' => 'dev-master',
             'version' => 'dev-master',
-            'reference' => '2ebc77992f9e6963ad1faaae473eafadd2959fe9',
+            'reference' => 'edeb7e148330fceb24246747f2aad2ca6b5e0e90',
             'type' => 'library',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),

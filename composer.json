@@ -1,9 +1,9 @@
 {
-    "name": "adichan/product",
-    "description": "For products",
+    "name": "adichan/transaction",
+    "description": "For transactions",
     "keywords": [
         "adichan",
-        "product"
+        "transaction"
     ],
     "homepage": "https://github.com/adichan/product",
     "license": "MIT",
@@ -40,13 +40,13 @@
     },
     "autoload": {
         "psr-4": {
-            "Adichan\\Product\\": "src",
+            "Adichan\\Transaction\\": "src",
             "Database\\Factories\\": "src/database/factories/"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "Adichan\\Product\\Tests\\": "tests"
+            "Adichan\\Transaction\\Tests\\": "tests"
         }
     },
     "scripts": {
@@ -63,12 +63,9 @@
     "extra": {
         "laravel": {
             "providers": [
-                "Adichan\\Product\\ProductServiceProvider"
+                "Adichan\\Transaction\\TransactionServiceProvider"
             ],
-	    "factories": "database/factories",
-            "aliases": {
-                "Product": "Adichan\\Product\\ProductFacade"
-            }
+	    "factories": "database/factories"
         }
     }
 }
