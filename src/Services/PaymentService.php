@@ -2,9 +2,9 @@
 
 namespace Adichan\Payment\Services;
 
-use Adichan\Payment\Interfaces\PaymentServiceInterface;
 use Adichan\Payment\Interfaces\PaymentGatewayInterface;
 use Adichan\Payment\Interfaces\PaymentResponseInterface;
+use Adichan\Payment\Interfaces\PaymentServiceInterface;
 use Adichan\Payment\Interfaces\PaymentVerificationInterface;
 use Adichan\Payment\Interfaces\PaymentWebhookResultInterface;
 use Adichan\Payment\Models\PaymentGateway as GatewayModel;
@@ -14,6 +14,7 @@ use Illuminate\Support\Manager;
 class PaymentService extends Manager implements PaymentServiceInterface
 {
     protected string $defaultGateway;
+
     protected array $gateways = [];
 
     public function getDefaultDriver(): string
@@ -21,7 +22,7 @@ class PaymentService extends Manager implements PaymentServiceInterface
         return $this->defaultGateway ?? config('payment.default_gateway', 'internal');
     }
 
-    public function gateway(string $name = null): PaymentGatewayInterface
+    public function gateway(?string $name = null): PaymentGatewayInterface
     {
         return $this->driver($name);
     }
@@ -29,14 +30,15 @@ class PaymentService extends Manager implements PaymentServiceInterface
     public function setGateway(string $name): self
     {
         $this->defaultGateway = $name;
+
         return $this;
     }
 
     public function pay(TransactionInterface $transaction, array $options = []): PaymentResponseInterface
     {
         $gateway = $this->gateway($options['gateway'] ?? null);
-        
-        if (!$gateway->isEnabled()) {
+
+        if (! $gateway->isEnabled()) {
             throw new \RuntimeException("Gateway {$gateway->getName()} is not enabled");
         }
 
@@ -47,15 +49,15 @@ class PaymentService extends Manager implements PaymentServiceInterface
     {
         $gatewayName = $data['gateway'] ?? $this->getDefaultDriver();
         $gateway = $this->gateway($gatewayName);
-        
+
         return $gateway->verifyPayment($paymentId, $data);
     }
 
     public function processWebhook(string $gatewayName, array $payload): PaymentWebhookResultInterface
     {
         $gateway = $this->gateway($gatewayName);
-        
-        if (!$gateway->supportsWebhook()) {
+
+        if (! $gateway->supportsWebhook()) {
             throw new \RuntimeException("Gateway {$gatewayName} does not support webhooks");
         }
 
@@ -67,7 +69,7 @@ class PaymentService extends Manager implements PaymentServiceInterface
         return GatewayModel::where('is_active', true)
             ->orderBy('priority')
             ->get()
-            ->mapWithKeys(fn($gateway) => [$gateway->name => $gateway->driver])
+            ->mapWithKeys(fn ($gateway) => [$gateway->name => $gateway->driver])
             ->toArray();
     }
 
@@ -75,8 +77,8 @@ class PaymentService extends Manager implements PaymentServiceInterface
     {
         $this->extend($name, function ($app) use ($gatewayClass) {
             $gatewayModel = GatewayModel::where('name', $name)->first();
-            
-            if (!$gatewayModel) {
+
+            if (! $gatewayModel) {
                 throw new \RuntimeException("Gateway configuration not found for: {$name}");
             }
 

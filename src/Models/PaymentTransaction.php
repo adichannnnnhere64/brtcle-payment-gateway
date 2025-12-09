@@ -10,7 +10,7 @@ use Illuminate\Database\Eloquent\Relations\MorphTo;
 
 class PaymentTransaction extends Model
 {
-	use HasFactory;
+    use HasFactory;
 
     protected $fillable = [
         'gateway_id',

@@ -33,7 +33,7 @@ class PaymentTransactionFactory extends Factory
             'verified_at' => $this->faker->optional()->dateTime(),
         ];
     }
-    
+
     // Add helper methods for different states
     public function forTransaction(Transaction $transaction): self
     {
@@ -41,7 +41,7 @@ class PaymentTransactionFactory extends Factory
             'transaction_id' => $transaction->id,
         ]);
     }
-    
+
     public function verified(): self
     {
         return $this->state([
@@ -49,7 +49,7 @@ class PaymentTransactionFactory extends Factory
             'verified_at' => now(),
         ]);
     }
-    
+
     public function pending(): self
     {
         return $this->state([

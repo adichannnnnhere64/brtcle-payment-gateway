@@ -2,7 +2,7 @@
 
 return [
     'default_gateway' => env('PAYMENT_DEFAULT_GATEWAY', 'internal'),
-    
+
     'gateways' => [
         'internal' => [
             'name' => 'Wallet',
@@ -11,7 +11,7 @@ return [
             'is_external' => false,
             'priority' => 1,
         ],
-        
+
         'stripe' => [
             'name' => 'Stripe',
             'driver' => 'stripe',
@@ -24,7 +24,7 @@ return [
                 'webhook_secret' => env('STRIPE_WEBHOOK_SECRET'),
             ],
         ],
-        
+
         'paypal' => [
             'name' => 'PayPal',
             'driver' => 'paypal',
@@ -39,11 +39,11 @@ return [
             ],
         ],
     ],
-    
+
     'webhook_path' => 'payment/webhook/{gateway}',
-    
+
     'currency' => 'USD',
-    
+
     'routes' => [
         'prefix' => 'payment',
         'middleware' => ['api'],

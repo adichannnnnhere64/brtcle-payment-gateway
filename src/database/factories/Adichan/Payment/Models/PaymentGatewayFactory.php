@@ -13,11 +13,11 @@ class PaymentGatewayFactory extends Factory
     {
         $gateways = ['stripe', 'paypal', 'internal'];
         $gateway = $this->faker->randomElement($gateways);
-        
-        $config = match($gateway) {
+
+        $config = match ($gateway) {
             'stripe' => [
-                'secret_key' => 'sk_test_' . $this->faker->sha256(),
-                'public_key' => 'pk_test_' . $this->faker->sha256(),
+                'secret_key' => 'sk_test_'.$this->faker->sha256(),
+                'public_key' => 'pk_test_'.$this->faker->sha256(),
             ],
             'paypal' => [
                 'client_id' => $this->faker->uuid(),
@@ -25,7 +25,7 @@ class PaymentGatewayFactory extends Factory
             ],
             default => [],
         };
-        
+
         return [
             'name' => ucfirst($gateway),
             'driver' => $gateway,
@@ -38,7 +38,7 @@ class PaymentGatewayFactory extends Factory
             ],
         ];
     }
-    
+
     public function internal(): self
     {
         return $this->state([
@@ -51,22 +51,22 @@ class PaymentGatewayFactory extends Factory
             'meta' => ['description' => 'Internal wallet payments'],
         ]);
     }
-    
+
     public function stripe(): self
     {
         return $this->state([
             'name' => 'Stripe',
             'driver' => 'stripe',
             'config' => [
-                'secret_key' => 'sk_test_' . $this->faker->sha256(),
-                'public_key' => 'pk_test_' . $this->faker->sha256(),
+                'secret_key' => 'sk_test_'.$this->faker->sha256(),
+                'public_key' => 'pk_test_'.$this->faker->sha256(),
             ],
             'is_active' => true,
             'is_external' => true,
             'priority' => 2,
         ]);
     }
-    
+
     public function paypal(): self
     {
         return $this->state([

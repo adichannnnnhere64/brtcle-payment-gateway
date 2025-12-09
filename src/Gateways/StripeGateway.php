@@ -2,43 +2,42 @@
 
 namespace Adichan\Payment\Gateways;
 
-use Adichan\Payment\Interfaces\PaymentGatewayInterface;
 use Adichan\Payment\Interfaces\PaymentResponseInterface;
 use Adichan\Payment\Interfaces\PaymentVerificationInterface;
 use Adichan\Payment\Interfaces\PaymentWebhookResultInterface;
 use Adichan\Payment\Models\PaymentGateway as GatewayModel;
 use Adichan\Transaction\Interfaces\TransactionInterface;
-use Stripe\Stripe;
-use Stripe\PaymentIntent;
-use Stripe\Refund;
 use Stripe\Customer;
-use Stripe\Webhook;
 use Stripe\Exception\ApiErrorException;
 use Stripe\Exception\SignatureVerificationException;
+use Stripe\PaymentIntent;
+use Stripe\Refund;
+use Stripe\Stripe;
+use Stripe\Webhook;
 
 class StripeGateway extends AbstractGateway
 {
     protected string $webhookSecret;
-    
+
     public function __construct(GatewayModel $model)
     {
         parent::__construct($model);
         $this->initializeStripe();
     }
-    
+
     protected function initializeStripe(): void
     {
         $apiKey = $this->config['secret_key'] ?? '';
         $this->webhookSecret = $this->config['webhook_secret'] ?? '';
-        
+
         if (empty($apiKey)) {
             throw new \RuntimeException('Stripe secret key is not configured');
         }
-        
+
         // Set Stripe API key
         Stripe::setApiKey($apiKey);
         Stripe::setApiVersion('2023-10-16'); // Use latest stable version
-        
+
         // Set app info for tracking
         Stripe::setAppInfo(
             'Adichan Payment Gateway',
@@ -47,11 +46,11 @@ class StripeGateway extends AbstractGateway
             'pp_partner_XXXXXXXX' // Partner ID if you have one
         );
     }
-    
+
     public function initiatePayment(TransactionInterface $transaction, array $options = []): PaymentResponseInterface
     {
         $this->validateTransaction($transaction);
-        
+
         try {
             // Build payment intent data
             $paymentIntentData = [
@@ -66,18 +65,18 @@ class StripeGateway extends AbstractGateway
                 'payment_method_types' => $options['payment_method_types'] ?? ['card'],
                 'capture_method' => $options['capture_method'] ?? 'automatic',
             ];
-            
+
             // Add customer if email is provided
-            if (!empty($options['customer_email'])) {
+            if (! empty($options['customer_email'])) {
                 $customer = $this->findOrCreateCustomer(
                     $options['customer_email'],
                     $options['customer_name'] ?? null
                 );
                 $paymentIntentData['customer'] = $customer->id;
             }
-            
+
             // Add shipping if provided
-            if (!empty($options['shipping'])) {
+            if (! empty($options['shipping'])) {
                 $paymentIntentData['shipping'] = [
                     'name' => $options['shipping']['name'] ?? null,
                     'address' => [
@@ -88,20 +87,20 @@ class StripeGateway extends AbstractGateway
                     ],
                 ];
             }
-            
+
             // Add statement descriptor if provided
-            if (!empty($options['statement_descriptor'])) {
+            if (! empty($options['statement_descriptor'])) {
                 $paymentIntentData['statement_descriptor'] = substr($options['statement_descriptor'], 0, 22);
             }
-            
+
             // Add receipt email if provided
-            if (!empty($options['receipt_email'])) {
+            if (! empty($options['receipt_email'])) {
                 $paymentIntentData['receipt_email'] = $options['receipt_email'];
             }
-            
+
             // Create Payment Intent
             $paymentIntent = PaymentIntent::create($paymentIntentData);
-            
+
             // Create payment record in database
             $payment = \Adichan\Payment\Models\PaymentTransaction::create([
                 'gateway_id' => $this->model->id,
@@ -123,14 +122,14 @@ class StripeGateway extends AbstractGateway
                     'client_secret' => $paymentIntent->client_secret,
                 ],
             ]);
-            
+
             // Determine if action is required
             $requiresAction = in_array($paymentIntent->status, [
                 'requires_action',
                 'requires_confirmation',
-                'requires_payment_method'
+                'requires_payment_method',
             ]);
-            
+
             return new \Adichan\Payment\PaymentResponse(
                 $paymentIntent->status !== 'canceled',
                 $paymentIntent->id,
@@ -144,7 +143,7 @@ class StripeGateway extends AbstractGateway
                 $requiresAction,
                 $this->buildActionData($paymentIntent, $options)
             );
-            
+
         } catch (ApiErrorException $e) {
             return new \Adichan\Payment\PaymentResponse(
                 false,
@@ -166,13 +165,13 @@ class StripeGateway extends AbstractGateway
             );
         }
     }
-    
+
     public function verifyPayment(string $paymentId, array $data = []): PaymentVerificationInterface
     {
         try {
             $paymentIntent = PaymentIntent::retrieve($paymentId);
             $payment = \Adichan\Payment\Models\PaymentTransaction::where('gateway_transaction_id', $paymentId)->first();
-            
+
             // Update payment status in database
             if ($payment) {
                 $payment->update([
@@ -182,19 +181,19 @@ class StripeGateway extends AbstractGateway
                         'verified_at' => now()->toIso8601String(),
                     ]),
                 ]);
-                
+
                 // If payment is successful, mark as verified
                 if ($paymentIntent->status === 'succeeded') {
                     $payment->markAsVerified(['stripe_verified' => true]);
-                    
+
                     if ($payment->transaction) {
                         $payment->transaction->complete();
                     }
                 }
             }
-            
+
             $isVerified = in_array($paymentIntent->status, ['succeeded', 'processing']);
-            
+
             return new \Adichan\Payment\PaymentVerification(
                 $isVerified,
                 $payment?->transaction,
@@ -203,7 +202,7 @@ class StripeGateway extends AbstractGateway
                 $isVerified ? now() : null,
                 ['payment_intent' => $paymentIntent->toArray()]
             );
-            
+
         } catch (ApiErrorException $e) {
             return new \Adichan\Payment\PaymentVerification(
                 false,
@@ -215,31 +214,31 @@ class StripeGateway extends AbstractGateway
             );
         }
     }
-    
-    public function refund(string $paymentId, float $amount = null): PaymentResponseInterface
+
+    public function refund(string $paymentId, ?float $amount = null): PaymentResponseInterface
     {
         try {
             // Retrieve payment intent to get charge ID
             $paymentIntent = PaymentIntent::retrieve($paymentId);
             $chargeId = $paymentIntent->latest_charge;
-            
-            if (!$chargeId) {
+
+            if (! $chargeId) {
                 throw new \RuntimeException('No charge found for this payment');
             }
-            
+
             $refundData = ['charge' => $chargeId];
-            
+
             if ($amount !== null) {
                 $refundData['amount'] = (int) ($amount * 100);
             }
-            
+
             // Add reason if provided
-            if (!empty($options['reason'])) {
+            if (! empty($options['reason'])) {
                 $refundData['reason'] = $options['reason']; // duplicate, fraudulent, requested_by_customer
             }
-            
+
             $refund = Refund::create($refundData);
-            
+
             // Update payment record
             $payment = \Adichan\Payment\Models\PaymentTransaction::where('gateway_transaction_id', $paymentId)->first();
             if ($payment) {
@@ -251,7 +250,7 @@ class StripeGateway extends AbstractGateway
                     ]),
                 ]);
             }
-            
+
             return new \Adichan\Payment\PaymentResponse(
                 $refund->status === 'succeeded',
                 $refund->id,
@@ -259,7 +258,7 @@ class StripeGateway extends AbstractGateway
                 $refund->status !== 'succeeded' ? 'Refund failed' : null,
                 ['stripe_refund' => $refund->toArray()]
             );
-            
+
         } catch (ApiErrorException $e) {
             return new \Adichan\Payment\PaymentResponse(
                 false,
@@ -270,16 +269,16 @@ class StripeGateway extends AbstractGateway
             );
         }
     }
-    
+
     public function supportsWebhook(): bool
     {
-        return !empty($this->webhookSecret);
+        return ! empty($this->webhookSecret);
     }
-    
+
     public function handleWebhook(array $payload): PaymentWebhookResultInterface
     {
         $sigHeader = $_SERVER['HTTP_STRIPE_SIGNATURE'] ?? '';
-        
+
         try {
             // Construct and verify the event
             $event = Webhook::constructEvent(
@@ -287,13 +286,13 @@ class StripeGateway extends AbstractGateway
                 $sigHeader,
                 $this->webhookSecret
             );
-            
+
             $eventType = $event->type;
             $paymentIntent = $event->data->object;
-            
+
             // Find payment record
             $payment = \Adichan\Payment\Models\PaymentTransaction::where('gateway_transaction_id', $paymentIntent->id)->first();
-            
+
             if ($payment) {
                 $payment->update([
                     'status' => $paymentIntent->status ?? $paymentIntent->payment_intent->status ?? $payment->status,
@@ -304,11 +303,11 @@ class StripeGateway extends AbstractGateway
                                 'type' => $eventType,
                                 'received_at' => now()->toIso8601String(),
                                 'payload' => $event->toArray(),
-                            ]
-                        ])
+                            ],
+                        ]),
                     ]),
                 ]);
-                
+
                 // Determine if we should process this webhook
                 $shouldProcess = in_array($eventType, [
                     'payment_intent.succeeded',
@@ -318,42 +317,42 @@ class StripeGateway extends AbstractGateway
                     'charge.succeeded',
                     'charge.failed',
                 ]);
-                
+
                 // Handle different event types
                 switch ($eventType) {
                     case 'payment_intent.succeeded':
                     case 'charge.succeeded':
                         $payment->update(['status' => 'succeeded']);
                         $payment->markAsVerified(['webhook_verified' => true]);
-                        
+
                         if ($payment->transaction) {
                             $payment->transaction->complete();
                         }
                         break;
-                        
+
                     case 'payment_intent.payment_failed':
                     case 'charge.failed':
                         $payment->update(['status' => 'failed']);
                         $payment->markAsFailed('Payment failed via Stripe webhook');
                         break;
-                        
+
                     case 'payment_intent.canceled':
                         $payment->update(['status' => 'canceled']);
                         break;
-                        
+
                     case 'charge.refunded':
                         $payment->update(['status' => 'refunded']);
                         break;
-                        
+
                     case 'payment_intent.requires_action':
                         $payment->update(['status' => 'requires_action']);
                         break;
-                        
+
                     case 'payment_intent.processing':
                         $payment->update(['status' => 'processing']);
                         break;
                 }
-                
+
                 return new \Adichan\Payment\PaymentWebhookResult(
                     $eventType,
                     $paymentIntent->id,
@@ -366,7 +365,7 @@ class StripeGateway extends AbstractGateway
                     ]
                 );
             }
-            
+
             // Payment record not found - this could be for a different type of event
             return new \Adichan\Payment\PaymentWebhookResult(
                 $eventType,
@@ -375,7 +374,7 @@ class StripeGateway extends AbstractGateway
                 false,
                 ['error' => 'Payment record not found', 'event_type' => $eventType]
             );
-            
+
         } catch (SignatureVerificationException $e) {
             // Invalid signature
             return new \Adichan\Payment\PaymentWebhookResult(
@@ -385,7 +384,7 @@ class StripeGateway extends AbstractGateway
                 false,
                 ['error' => $e->getMessage(), 'signature_invalid' => true]
             );
-            
+
         } catch (ApiErrorException $e) {
             return new \Adichan\Payment\PaymentWebhookResult(
                 'stripe_api_error',
@@ -394,7 +393,7 @@ class StripeGateway extends AbstractGateway
                 false,
                 ['error' => $e->getMessage(), 'stripe_error' => $e->getError()?->toArray()]
             );
-            
+
         } catch (\Exception $e) {
             return new \Adichan\Payment\PaymentWebhookResult(
                 'error',
@@ -405,7 +404,7 @@ class StripeGateway extends AbstractGateway
             );
         }
     }
-    
+
     /**
      * Find or create a Stripe customer
      */
@@ -414,36 +413,36 @@ class StripeGateway extends AbstractGateway
         try {
             // Try to find existing customer by email
             $customers = Customer::all(['email' => $email, 'limit' => 1]);
-            
+
             if (count($customers->data) > 0) {
                 return $customers->data[0];
             }
-            
+
             // Create new customer
             $customerData = ['email' => $email];
-            
+
             if ($name) {
                 $customerData['name'] = $name;
             }
-            
-            if (!empty($this->config['customer_metadata'])) {
+
+            if (! empty($this->config['customer_metadata'])) {
                 $customerData['metadata'] = $this->config['customer_metadata'];
             }
-            
+
             return Customer::create($customerData);
-            
+
         } catch (ApiErrorException $e) {
-            throw new \RuntimeException("Failed to create Stripe customer: " . $e->getMessage());
+            throw new \RuntimeException('Failed to create Stripe customer: '.$e->getMessage());
         }
     }
-    
+
     /**
      * Build action data for frontend
      */
     protected function buildActionData(PaymentIntent $paymentIntent, array $options): array
     {
         $actionData = [];
-        
+
         if ($paymentIntent->status === 'requires_action' && $paymentIntent->next_action) {
             if ($paymentIntent->next_action->type === 'redirect_to_url') {
                 $actionData = [
@@ -457,16 +456,16 @@ class StripeGateway extends AbstractGateway
                 ];
             }
         }
-        
+
         // Add Stripe.js configuration
         $actionData['stripe_config'] = [
             'publishable_key' => $this->config['public_key'] ?? '',
             'api_version' => Stripe::getApiVersion(),
         ];
-        
+
         return $actionData;
     }
-    
+
     /**
      * Confirm a payment intent (for manual capture)
      */
@@ -474,18 +473,18 @@ class StripeGateway extends AbstractGateway
     {
         try {
             $paymentIntent = PaymentIntent::retrieve($paymentId);
-            
+
             $confirmData = [];
-            if (!empty($data['payment_method'])) {
+            if (! empty($data['payment_method'])) {
                 $confirmData['payment_method'] = $data['payment_method'];
             }
-            
-            if (!empty($data['return_url'])) {
+
+            if (! empty($data['return_url'])) {
                 $confirmData['return_url'] = $data['return_url'];
             }
-            
+
             $paymentIntent = $paymentIntent->confirm($confirmData);
-            
+
             return new \Adichan\Payment\PaymentResponse(
                 in_array($paymentIntent->status, ['succeeded', 'processing']),
                 $paymentIntent->id,
@@ -493,7 +492,7 @@ class StripeGateway extends AbstractGateway
                 $paymentIntent->last_payment_error?->message,
                 ['payment_intent' => $paymentIntent->toArray()]
             );
-            
+
         } catch (ApiErrorException $e) {
             return new \Adichan\Payment\PaymentResponse(
                 false,
@@ -504,7 +503,7 @@ class StripeGateway extends AbstractGateway
             );
         }
     }
-    
+
     /**
      * Capture a payment intent (for manual capture)
      */
@@ -512,14 +511,14 @@ class StripeGateway extends AbstractGateway
     {
         try {
             $paymentIntent = PaymentIntent::retrieve($paymentId);
-            
+
             $captureData = [];
-            if (!empty($data['amount_to_capture'])) {
+            if (! empty($data['amount_to_capture'])) {
                 $captureData['amount_to_capture'] = (int) ($data['amount_to_capture'] * 100);
             }
-            
+
             $paymentIntent = $paymentIntent->capture($captureData);
-            
+
             // Update payment record
             $payment = \Adichan\Payment\Models\PaymentTransaction::where('gateway_transaction_id', $paymentId)->first();
             if ($payment) {
@@ -530,12 +529,12 @@ class StripeGateway extends AbstractGateway
                         'capture_response' => $paymentIntent->toArray(),
                     ]),
                 ]);
-                
+
                 if ($paymentIntent->status === 'succeeded') {
                     $payment->markAsVerified(['manually_captured' => true]);
                 }
             }
-            
+
             return new \Adichan\Payment\PaymentResponse(
                 $paymentIntent->status === 'succeeded',
                 $paymentIntent->id,
@@ -543,7 +542,7 @@ class StripeGateway extends AbstractGateway
                 null,
                 ['payment_intent' => $paymentIntent->toArray()]
             );
-            
+
         } catch (ApiErrorException $e) {
             return new \Adichan\Payment\PaymentResponse(
                 false,
@@ -554,7 +553,7 @@ class StripeGateway extends AbstractGateway
             );
         }
     }
-    
+
     /**
      * Cancel a payment intent
      */
@@ -563,7 +562,7 @@ class StripeGateway extends AbstractGateway
         try {
             $paymentIntent = PaymentIntent::retrieve($paymentId);
             $paymentIntent = $paymentIntent->cancel($data);
-            
+
             // Update payment record
             $payment = \Adichan\Payment\Models\PaymentTransaction::where('gateway_transaction_id', $paymentId)->first();
             if ($payment) {
@@ -575,7 +574,7 @@ class StripeGateway extends AbstractGateway
                     ]),
                 ]);
             }
-            
+
             return new \Adichan\Payment\PaymentResponse(
                 true,
                 $paymentIntent->id,
@@ -583,7 +582,7 @@ class StripeGateway extends AbstractGateway
                 null,
                 ['payment_intent' => $paymentIntent->toArray()]
             );
-            
+
         } catch (ApiErrorException $e) {
             return new \Adichan\Payment\PaymentResponse(
                 false,

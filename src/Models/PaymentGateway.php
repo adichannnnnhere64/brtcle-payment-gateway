@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class PaymentGateway extends Model
 {
-	use HasFactory;
+    use HasFactory;
 
     protected $fillable = [
         'name',

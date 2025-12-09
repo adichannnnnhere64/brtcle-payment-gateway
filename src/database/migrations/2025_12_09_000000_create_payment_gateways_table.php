@@ -35,7 +35,7 @@ return new class extends Migration
             $table->boolean('webhook_received')->default(false);
             $table->timestamp('verified_at')->nullable();
             $table->timestamps();
-            
+
             $table->index(['gateway_transaction_id', 'gateway_name']);
             $table->index('status');
         });

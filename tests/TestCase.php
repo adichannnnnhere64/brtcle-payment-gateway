@@ -29,7 +29,7 @@ class TestCase extends Orchestra
         $this->loadMigrationsFrom(__DIR__.'/../../Wallet/src/database/migrations');
         $this->loadMigrationsFrom(__DIR__.'/../src/database/migrations');
         $this->createUsersTable();
-		$this->createProductTable();
+        $this->createProductTable();
 
     }
 
@@ -43,17 +43,17 @@ class TestCase extends Orchestra
         });
     }
 
-	protected function createProductTable(): void
-{
-    if (Schema::hasTable('products')) {
-        Schema::create('products', function ($table) {
-            $table->id();
-            $table->string('name');
-            $table->decimal('base_price', 12, 4);
-            $table->timestamps();
-        });
+    protected function createProductTable(): void
+    {
+        if (Schema::hasTable('products')) {
+            Schema::create('products', function ($table) {
+                $table->id();
+                $table->string('name');
+                $table->decimal('base_price', 12, 4);
+                $table->timestamps();
+            });
+        }
     }
-}
 
     protected function getEnvironmentSetUp($app): void
     {

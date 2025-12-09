@@ -12,6 +12,7 @@ use Adichan\Transaction\Interfaces\TransactionInterface;
 abstract class AbstractGateway implements PaymentGatewayInterface
 {
     protected GatewayModel $model;
+
     protected array $config;
 
     public function __construct(GatewayModel $model)
@@ -36,9 +37,11 @@ abstract class AbstractGateway implements PaymentGatewayInterface
     }
 
     abstract public function initiatePayment(TransactionInterface $transaction, array $options = []): PaymentResponseInterface;
+
     abstract public function verifyPayment(string $paymentId, array $data = []): PaymentVerificationInterface;
-    abstract public function refund(string $paymentId, float $amount = null): PaymentResponseInterface;
-    
+
+    abstract public function refund(string $paymentId, ?float $amount = null): PaymentResponseInterface;
+
     public function supportsWebhook(): bool
     {
         return false;
