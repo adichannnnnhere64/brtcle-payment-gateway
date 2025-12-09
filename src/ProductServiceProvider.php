@@ -2,6 +2,8 @@
 
 namespace Adichan\Product;
 
+use Adichan\Product\Interfaces\ProductRepositoryInterface;
+use Adichan\Product\Repositories\ProductRepository;
 use Illuminate\Support\ServiceProvider;
 
 class ProductServiceProvider extends ServiceProvider
@@ -16,13 +18,21 @@ class ProductServiceProvider extends ServiceProvider
          */
         // $this->loadTranslationsFrom(__DIR__.'/../resources/lang', 'product');
         // $this->loadViewsFrom(__DIR__.'/../resources/views', 'product');
-        // $this->loadMigrationsFrom(__DIR__.'/../database/migrations');
+        /* $this->loadMigrationsFrom(__DIR__.'/../database/migrations'); */
         // $this->loadRoutesFrom(__DIR__.'/routes.php');
 
         if ($this->app->runningInConsole()) {
             $this->publishes([
                 __DIR__.'/../config/config.php' => config_path('product.php'),
             ], 'config');
+
+            $this->publishes([
+                __DIR__.'/../database/migrations' => database_path('migrations'),
+            ], ['migrations', 'product-variation-migrations']);
+
+            $this->publishes([
+                __DIR__.'/../database/factories' => database_path('factories'),
+            ], ['factories', 'product-variation-factories']);
 
             // Publishing the views.
             /*$this->publishes([
@@ -56,5 +66,7 @@ class ProductServiceProvider extends ServiceProvider
         $this->app->singleton('product', function () {
             return new Product;
         });
+
+        $this->app->bind(ProductRepositoryInterface::class, ProductRepository::class);
     }
 }
