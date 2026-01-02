@@ -82,7 +82,8 @@ class PaymentService extends Manager implements PaymentServiceInterface
                 throw new \RuntimeException("Gateway configuration not found for: {$name}");
             }
 
-            return new $gatewayClass($gatewayModel);
+            /* return new $gatewayClass($gatewayModel); */
+            return $app->make($gatewayClass, ['model' => $gatewayModel]);
         });
     }
 

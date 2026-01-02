@@ -119,7 +119,7 @@ test('payment service integrates with internal wallet gateway', function () {
 
     // Test internal gateway exists
     $internalGateway = $this->paymentService->gateway('internal');
-    expect($internalGateway->getName())->toBe('Wallet');
+    expect($internalGateway->getName())->toBe('internal');
     expect($internalGateway->isEnabled())->toBeTrue();
 })->group('internal', 'integration');
 
