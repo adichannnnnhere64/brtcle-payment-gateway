@@ -75,7 +75,7 @@ class PaymentService extends Manager implements PaymentServiceInterface
 
     public function registerGateway(string $name, string $gatewayClass): void
     {
-        $this->extend($name, function ($app) use ($gatewayClass) {
+        $this->extend($name, function ($app) use ($gatewayClass, $name) {
             $gatewayModel = GatewayModel::where('name', $name)->first();
 
             if (! $gatewayModel) {

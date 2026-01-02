@@ -19,6 +19,8 @@ class StripeGateway extends AbstractGateway
 {
     protected string $webhookSecret;
 
+    protected ?string $stripeApiKey; // Add this
+
     public function __construct(GatewayModel $model)
     {
         parent::__construct($model);
@@ -29,14 +31,19 @@ class StripeGateway extends AbstractGateway
     {
         $apiKey = $this->config['secret_key'] ?? '';
         $this->webhookSecret = $this->config['webhook_secret'] ?? '';
+        $this->stripeApiKey = $apiKey; // Store the key
 
         if (empty($apiKey)) {
             throw new \RuntimeException('Stripe secret key is not configured');
         }
 
         // Set Stripe API key
-        Stripe::setApiKey($apiKey);
-        Stripe::setApiVersion('2023-10-16'); // Use latest stable version
+        /* Stripe::setApiKey($apiKey); */
+        /* Stripe::setApiVersion('2023-10-16'); // Use latest stable version */
+        if (! app()->environment('testing') || ! config('payment.mock_stripe', false)) {
+            Stripe::setApiKey($apiKey);
+            Stripe::setApiVersion('2023-10-16');
+        }
 
         // Set app info for tracking
         Stripe::setAppInfo(
@@ -45,6 +52,19 @@ class StripeGateway extends AbstractGateway
             'https://github.com/adichan/payment',
             'pp_partner_XXXXXXXX' // Partner ID if you have one
         );
+    }
+
+    public function getStripeClient()
+    {
+        return app()->environment('testing') && config('payment.mock_stripe', false)
+            ? $this->getMockStripeClient()
+            : new \Stripe\StripeClient($this->stripeApiKey);
+    }
+
+    protected function getMockStripeClient()
+    {
+        // This would be mocked in tests
+        return null;
     }
 
     public function initiatePayment(TransactionInterface $transaction, array $options = []): PaymentResponseInterface

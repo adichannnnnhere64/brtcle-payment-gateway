@@ -3,12 +3,20 @@
 declare(strict_types=1);
 
 use Adichan\Payment\Tests\TestCase;
+use Dotenv\Dotenv;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Process;
 use Illuminate\Support\Sleep;
 use Illuminate\Support\Str;
+
+$envPath = __DIR__.'/../';
+
+if (file_exists($envPath.'.env.testing')) {
+    $dotenv = Dotenv::createImmutable($envPath, '.env.testing');
+    $dotenv->load();
+}
 
 /* use Orchestra\Testbench\TestCase; */
 
