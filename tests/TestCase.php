@@ -24,9 +24,9 @@ class TestCase extends Orchestra
 
     protected function defineDatabaseMigrations(): void
     {
-        $this->loadMigrationsFrom(__DIR__.'/../../Product/src/database/migrations');
-        $this->loadMigrationsFrom(__DIR__.'/../../Transaction/src/database/migrations');
-        $this->loadMigrationsFrom(__DIR__.'/../../Wallet/src/database/migrations');
+        $this->loadMigrationsFrom(__DIR__.'/../vendor/adichan/product/src/database/migrations');
+        $this->loadMigrationsFrom(__DIR__.'/../vendor/adichan/transaction/src/database/migrations');
+        $this->loadMigrationsFrom(__DIR__.'/../vendor/adichan/wallet/src/database/migrations');
         $this->loadMigrationsFrom(__DIR__.'/../src/database/migrations');
         $this->createUsersTable();
         $this->createProductTable();

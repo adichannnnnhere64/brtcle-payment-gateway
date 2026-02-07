@@ -17,25 +17,11 @@
             "role": "Developer"
         }
     ],
-	   "repositories": [
-        {
-            "type": "path",
-            "url": "../Transaction"
-        },
-        {
-            "type": "path",
-            "url": "../Wallet"
-        },
-        {
-            "type": "path",
-            "url": "../Product"
-        }
-    ],
     "require": {
         "php": "^8.3",
-        "adichan/transaction": "*",
-        "adichan/wallet": "*",
-        "adichan/product": "*",
+        "adichan/transaction": "dev-master",
+        "adichan/wallet": "dev-master",
+        "adichan/product": "dev-master",
         "illuminate/support": "^12.0",
         "paypal/paypal-checkout-sdk": "^1.0",
         "stripe/stripe-php": "^19.0"
