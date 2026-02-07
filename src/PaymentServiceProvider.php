@@ -25,11 +25,11 @@ class PaymentServiceProvider extends ServiceProvider
 
         if ($this->app->runningInConsole()) {
             $this->publishes([
-                __DIR__.'/../config/payment.php' => config_path('payment.php'),
+                __DIR__.'/config/payment.php' => config_path('payment.php'),
             ], 'payment-config');
 
             $this->publishes([
-                __DIR__.'/../database/migrations' => database_path('migrations'),
+                __DIR__.'/database/migrations' => database_path('migrations'),
             ], 'payment-migrations');
         }
 
