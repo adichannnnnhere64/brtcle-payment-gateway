@@ -67,124 +67,145 @@ class StripeGateway extends AbstractGateway
         return null;
     }
 
-    public function initiatePayment(TransactionInterface $transaction, array $options = []): PaymentResponseInterface
-    {
-        $this->validateTransaction($transaction);
+	// src/Gateways/StripeGateway.php
 
-        try {
-            // Build payment intent data
-            $paymentIntentData = [
-                'amount' => (int) ($transaction->getTotal() * 100), // Convert to cents
-                'currency' => strtolower($options['currency'] ?? 'usd'),
-                'description' => $options['description'] ?? "Transaction #{$transaction->getId()}",
-                'metadata' => [
-                    'transaction_id' => $transaction->getId(),
-                    'customer_ip' => request()->ip(),
-                    'platform' => 'adichan_payment',
-                ],
-                'payment_method_types' => $options['payment_method_types'] ?? ['card'],
-                'capture_method' => $options['capture_method'] ?? 'automatic',
-            ];
 
-            // Add customer if email is provided
-            if (! empty($options['customer_email'])) {
-                $customer = $this->findOrCreateCustomer(
-                    $options['customer_email'],
-                    $options['customer_name'] ?? null
-                );
-                $paymentIntentData['customer'] = $customer->id;
-            }
+	public function initiatePayment(TransactionInterface $transaction, array $options = []): PaymentResponseInterface
+{
 
-            // Add shipping if provided
-            if (! empty($options['shipping'])) {
-                $paymentIntentData['shipping'] = [
-                    'name' => $options['shipping']['name'] ?? null,
-                    'address' => [
-                        'line1' => $options['shipping']['address']['line1'] ?? null,
-                        'city' => $options['shipping']['address']['city'] ?? null,
-                        'country' => $options['shipping']['address']['country'] ?? null,
-                        'postal_code' => $options['shipping']['address']['postal_code'] ?? null,
-                    ],
-                ];
-            }
+		\Log::info('StripeGateway initiatePayment called', [
+    'transaction_id' => $transaction->getId(),
+    'amount' => $transaction->getTotal(),
 
-            // Add statement descriptor if provided
-            if (! empty($options['statement_descriptor'])) {
-                $paymentIntentData['statement_descriptor'] = substr($options['statement_descriptor'], 0, 22);
-            }
+    'options_keys' => array_keys($options),
+    'has_payment_method' => !empty($options['payment_method']),
+    'payment_method' => $options['payment_method'] ?? 'not_provided',
+]);
 
-            // Add receipt email if provided
-            if (! empty($options['receipt_email'])) {
-                $paymentIntentData['receipt_email'] = $options['receipt_email'];
-            }
+    $this->validateTransaction($transaction);
 
-            // Create Payment Intent
-            $paymentIntent = PaymentIntent::create($paymentIntentData);
-
-            // Create payment record in database
-            $payment = \Adichan\Payment\Models\PaymentTransaction::create([
-                'gateway_id' => $this->model->id,
+    try {
+        // Build payment intent data
+        $paymentIntentData = [
+            'amount' => (int) ($transaction->getTotal() * 100), // Convert to cents
+            'currency' => strtolower($options['currency'] ?? 'usd'),
+            'description' => $options['description'] ?? "Transaction #{$transaction->getId()}",
+            'metadata' => [
                 'transaction_id' => $transaction->getId(),
-                'gateway_transaction_id' => $paymentIntent->id,
-                'gateway_name' => $this->getName(),
-                'amount' => $transaction->getTotal(),
-                'currency' => strtoupper($options['currency'] ?? 'USD'),
-                'status' => $paymentIntent->status,
-                'payment_method' => 'stripe',
-                'payer_info' => $paymentIntent->customer ? [
-                    'customer_id' => $paymentIntent->customer,
-                    'email' => $options['customer_email'] ?? null,
-                    'name' => $options['customer_name'] ?? null,
-                ] : null,
-                'metadata' => [
-                    'payment_intent' => $paymentIntent->toArray(),
-                    'options' => $options,
-                    'client_secret' => $paymentIntent->client_secret,
-                ],
-            ]);
+                'customer_ip' => request()->ip(),
+                'platform' => 'adichan_payment',
+            ],
+            'payment_method_types' => $options['payment_method_types'] ?? ['card'],
+            'capture_method' => $options['capture_method'] ?? 'automatic',
+        ];
 
-            // Determine if action is required
-            $requiresAction = in_array($paymentIntent->status, [
-                'requires_action',
-                'requires_confirmation',
-                'requires_payment_method',
-            ]);
-
-            return new \Adichan\Payment\PaymentResponse(
-                $paymentIntent->status !== 'canceled',
-                $paymentIntent->id,
-                null,
-                $paymentIntent->last_payment_error?->message,
-                [
-                    'client_secret' => $paymentIntent->client_secret,
-                    'payment_intent' => $paymentIntent->toArray(),
-                    'payment_id' => $payment->id,
-                ],
-                $requiresAction,
-                $this->buildActionData($paymentIntent, $options)
+        // Add customer if email is provided
+        if (! empty($options['customer_email'])) {
+            $customer = $this->findOrCreateCustomer(
+                $options['customer_email'],
+                $options['customer_name'] ?? null
             );
-
-        } catch (ApiErrorException $e) {
-            return new \Adichan\Payment\PaymentResponse(
-                false,
-                null,
-                null,
-                $e->getMessage(),
-                [
-                    'error' => $e->getMessage(),
-                    'stripe_error' => $e->getError()?->toArray(),
-                ]
-            );
-        } catch (\Exception $e) {
-            return new \Adichan\Payment\PaymentResponse(
-                false,
-                null,
-                null,
-                $e->getMessage(),
-                ['error' => $e->getMessage()]
-            );
+            $paymentIntentData['customer'] = $customer->id;
         }
+
+        // CRITICAL FIX: If payment method is provided, add it to the payment intent
+        if (! empty($options['payment_method'])) {
+            $paymentIntentData['payment_method'] = $options['payment_method'];
+            $paymentIntentData['confirm'] = true; // This tells Stripe to confirm immediately
+            $paymentIntentData['return_url'] = $options['return_url'] ?? null;
+        }
+
+        // Add shipping if provided
+        if (! empty($options['shipping'])) {
+            $paymentIntentData['shipping'] = [
+                'name' => $options['shipping']['name'] ?? null,
+                'address' => [
+                    'line1' => $options['shipping']['address']['line1'] ?? null,
+                    'city' => $options['shipping']['address']['city'] ?? null,
+                    'country' => $options['shipping']['address']['country'] ?? null,
+                    'postal_code' => $options['shipping']['address']['postal_code'] ?? null,
+                ],
+            ];
+        }
+
+        // Add statement descriptor if provided
+        if (! empty($options['statement_descriptor'])) {
+            $paymentIntentData['statement_descriptor'] = substr($options['statement_descriptor'], 0, 22);
+        }
+
+        // Add receipt email if provided
+        if (! empty($options['receipt_email'])) {
+            $paymentIntentData['receipt_email'] = $options['receipt_email'];
+        }
+
+        // Create Payment Intent
+        $paymentIntent = PaymentIntent::create($paymentIntentData);
+
+        // Create payment record in database
+        $payment = \Adichan\Payment\Models\PaymentTransaction::create([
+            'gateway_id' => $this->model->id,
+            'transaction_id' => $transaction->getId(),
+            'gateway_transaction_id' => $paymentIntent->id,
+            'gateway_name' => $this->getName(),
+            'amount' => $transaction->getTotal(),
+            'currency' => strtoupper($options['currency'] ?? 'USD'),
+            'status' => $paymentIntent->status,
+            'payment_method' => 'card',
+            'payer_info' => $paymentIntent->customer ? [
+                'customer_id' => $paymentIntent->customer,
+                'email' => $options['customer_email'] ?? null,
+                'name' => $options['customer_name'] ?? null,
+            ] : null,
+            'metadata' => [
+                'payment_intent' => $paymentIntent->toArray(),
+                'options' => $options,
+                'client_secret' => $paymentIntent->client_secret,
+            ],
+        ]);
+
+        // Determine if action is required
+        $requiresAction = in_array($paymentIntent->status, [
+            'requires_action',
+            'requires_confirmation',
+            'requires_payment_method',
+        ]);
+
+        return new \Adichan\Payment\PaymentResponse(
+            $paymentIntent->status !== 'canceled',
+            $paymentIntent->id,
+            null,
+            $paymentIntent->last_payment_error?->message,
+            [
+                'client_secret' => $paymentIntent->client_secret,
+                'payment_intent' => $paymentIntent->toArray(),
+                'payment_id' => $payment->id,
+            ],
+            $requiresAction,
+            $this->buildActionData($paymentIntent, $options)
+        );
+
+    } catch (ApiErrorException $e) {
+        return new \Adichan\Payment\PaymentResponse(
+            false,
+            null,
+            null,
+            $e->getMessage(),
+            [
+                'error' => $e->getMessage(),
+                'stripe_error' => $e->getError()?->toArray(),
+            ]
+        );
+    } catch (\Exception $e) {
+        return new \Adichan\Payment\PaymentResponse(
+            false,
+            null,
+            null,
+            $e->getMessage(),
+            ['error' => $e->getMessage()]
+        );
     }
+}
+
 
     public function verifyPayment(string $paymentId, array $data = []): PaymentVerificationInterface
     {
