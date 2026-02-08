@@ -11,6 +11,7 @@ return new class extends Migration
         Schema::table('users', function (Blueprint $table) {
             $table->string('stripe_customer_id')->nullable()->after('email');
             $table->string('default_payment_method_id')->nullable()->after('stripe_customer_id');
+	    $table->json('payment_methods')->nullable();
         });
     }
 
